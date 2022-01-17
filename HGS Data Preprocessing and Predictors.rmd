@@ -1,6 +1,5 @@
 ---
-title: "MATH208 Final Project"
-author: "Brandon Fook Chong | Annie Kuo | Rui Kun Zuo"
+title: "HGS Data Preprocessing and Predictors"
 output:
   word_document: default
   html_document:
@@ -26,14 +25,13 @@ Flix_data <- filter(Flix_data, `Series or Movie`== "Movie") %>% na.omit() %>%
 **Data Cleaning**
 In order to clean the data and make it easier for us to use in following tasks, we started by filtering out the series and all rows containing at least one missing datum (NA variable) such that all remaining rows concerned only movies for which all information is present. The dataset's *Runtime* column has then been refactored by increasing length. We have also only kept the columns for which we are interested in, as described by the project guidelines. This cleaned-up data is in the tibble called Flix_data.
 
-**a.**
+** Hidden Gem Score Predictors **
 The Hidden Gem Score seems to have no association to the Runtime Category. 
 In order to arrive to this conclusion, we plotted a histogram for each Runtime Category. However, we quickly realized that the low number of movies under 30 minutes makes it hard to see the distribution in a normal histogram since it uses the same scale as the other two Runtime categories (see Figure 1).
 
 We therefore decided to opt for a density plot (see Figure 2) and a density histogram (see Figure 3) where we can better see the trend. From those, we can see that the peaks are all in between [2.5, 5] which indicate that most of the movies received the same approximate Hidden Gem Score regardless of the runtime. We have also made boxplots (see Figure 4) to help us compare the interquartile ranges. We can see that the median Hidden Gem Score for movies with >2 hrs Runtime is very slightly higher than those for the two other categories. However, we believe that the slight increase is negligible.
 
-```{r Task 1a part 1: Runtime Categories}
-# FOR RUNTIME
+```{r Runtime Categories}
 ggplot(group_by(Flix_data, Runtime), aes(x=`Hidden Gem Score`, group=Runtime, fill=Runtime)) + 
   geom_histogram(bins=15) + 
   xlab("Hidden Gem Score") +
@@ -71,9 +69,7 @@ After plotting each data point for each language (see Figure 5), we noticed that
 
 Since plotting each data point for each language resulted in a convoluted graph, we have also decided to collapse the data into 2 data points per language: its average Hidden Gem Score and its median Hidden Gem Score. We then plotted the means and the medians in two separates graphs to evaluate once again if there is any correlation between language and Hidden Gem Scores (see Figures 6 and 7). Here again, the means and medians seem to be somewhat consistent with the exception of a couple of languages. However, since the means and medians do not reflect the size of the dataset (and many languages only appear once), they might not be representative of the language's on the Hidden Gem Score.
 
-```{r Task 1a part 2: Languages}
-# FOR LANGUAGES
-
+```{r Languages}
 Flix_lang_sep <- separate_rows(Flix_data, Languages, sep=",")
 
 ggplot(Flix_lang_sep, aes(x=Languages, y=`Hidden Gem Score`)) +
@@ -104,12 +100,11 @@ group_by(Flix_lang_sep, Languages)%>% summarise(count= n())
 ```
 
 
-**b.**
-Yes, all three review site scores (IMDb, Rotten Tomatoes, Metacritic) seem to be some correlation with the Hidden Gem Scores.
+All three review site scores (IMDb, Rotten Tomatoes, Metacritic) seem to be some correlation with the Hidden Gem Scores.
 
 As shown by the scatter plots of the three review site scores against their Hidden Gem Scores (see Figures 8, 9, 10), we noticed that under a Hidden Gem Score of 5.0, there is a strong positive correlation between the three review site scores and the Hidden Gem Scores. On the other hand, there does not seem to be a correlation between the two variables when the Hidden Gem Score is above 5.0.
 
-```{r Task 1b}
+```{r Review Site Scores}
 Flix_data_sites <- Flix_data %>% pivot_longer(cols=c(`IMDb Score`, `Rotten Tomatoes Score`, `Metacritic Score`), names_to= "Site", values_to = "Site_Score") %>% group_by(Site)
 
 ggplot(Flix_data, aes(y=`IMDb Score`, x=`Hidden Gem Score`)) +
@@ -133,13 +128,11 @@ ggplot(Flix_data, aes(y=`Metacritic Score`, x=`Hidden Gem Score`)) +
 
 ```
 
-
-**c.**
-Yes, there is an upward trend over time in the Hidden Gem Scores by category of Runtime length.
+There is an upward trend over time in the Hidden Gem Scores by category of Runtime length.
 
 We first started out by plotting every single data point, but it was uninterpretable due to the fact that there was an increasing amount of points over time (see Figure 11). However, if we take 2015 as the year when Netflix became popular and plot the average Hidden Gem Score for every year by Runtime category (narrowing it down to one data point per year), we can see an upward trend starting around the time Netflix became popular for longer movies.
 
-```{r Task 1c}
+```{r Netflix Influence}
 ggplot(group_by(Flix_data, Runtime), aes(x=`Release Date`, y=`Hidden Gem Score`, group=Runtime)) +
   geom_point() +
   ylab("Hidden Gem Score") +
