@@ -1,6 +1,5 @@
 ---
-title: "MATH208 Final Project"
-author: "Brandon Fook Chong | Annie Kuo | Rui Kun Zuo"
+title: "HGS Regression Tree"
 output:
   pdf_document: default
   html_document:
@@ -16,18 +15,9 @@ library(rpart)
 library(rpart.plot)
 Flix_data <- read_csv(here("Final_Project_FlixGem.csv"), col_names=TRUE)
 Flix_data <- filter(Flix_data, `Series or Movie`== "Movie") %>% na.omit() %>% mutate(Runtime= fct_relevel(Runtime, c("< 30 minutes", "1-2 hour", "> 2 hrs")))
-
-
 ```
 
-# TASK 2: Data wrangling and exploratory data analyses
-
-We first started by computing the regression tree using all the different combinations of languages, runtime, and the three site scores as predictors (see Figure 1). However, the regression tree was highly unreadable because there was too many different combinations of languages for some movies.
-Next, we tried grouping the movies by individual languages. Although better, the regression tree was still too stuffed (see Figure 2). Another problem with this tree was that the language categories were no longer mutually exclusive. This would mean that a single movie would qualify for multiple leaves, breaking the property of a regression tree.
-
-Lastly, we decided to remove the languages from the list of predictors. In fact, we concluded in task 1 of this project that the Hidden Gem Scores were not strongly associated with the languages. This resulted in a much more legible regression tree (see figure 3). Based on this fitted tree, the most important feature for predicting the hidden Gem Score are the Rotten Tomatoes and IMDb scores. However, the IMDb score matters more for predicting the Hidden Gem Score of the highest rated titles.
-
-```{r Task 2: Runtime Categories}
+```{r HGS Regression Tree}
 Flix_data <- Flix_data %>% select(Languages, `Hidden Gem Score`, Runtime, `IMDb Score`,`Metacritic Score`,  `Rotten Tomatoes Score`)
 Flix_lang_sep <- separate_rows(Flix_data, Languages, sep=",")
 Flix_data_score <- Flix_data %>% select(`Hidden Gem Score`, Runtime, `IMDb Score`,`Metacritic Score`,  `Rotten Tomatoes Score`)
