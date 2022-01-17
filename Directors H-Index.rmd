@@ -1,5 +1,5 @@
 ---
-title: "208-Final-Project-Task-3"
+title: "movie-data-preprocessing-and-ratings-analysis"
 output: html_document
 ---
 
@@ -10,13 +10,7 @@ Flix_data <- read_csv(here("Final_Project_FlixGem.csv"), col_names=TRUE)
 Flix_data <- filter(Flix_data, `Series or Movie`== "Movie") %>% na.omit() %>% mutate(Runtime= fct_relevel(Runtime, c("< 30 minutes", "1-2 hour", "> 2 hrs")))
 ```
 
-# TASK 3: An H-index for directors
-
-We started by further cleaning the data and only keeping the Director and Hidden Gem Score columns and making sure that each row contains only one director. We then grouped it by Director.
-
-For each director, we computed their H-index using the function H_index (see code below). We ranked the directors according to their H-index to compute the top 10 directors. However, if we wanted to resolve equalities, then we also had to consider directors tied for 10th place. This resulted in the second tibble shown below where 57 directors were tied for 10th place.
-
-``` {r Task 3}
+``` {r H-index for directors}
 Flix_data <- separate_rows(Flix_data, Director, sep= ",") %>% group_by(Director) %>% select(Director, `Hidden Gem Score`)
 
 H_index <- function(gem_scores) {
@@ -39,9 +33,7 @@ top_directors<- Flix_data %>% summarize(H_index= H_index(`Hidden Gem Score`))
 # top 10 directors
 top_directors[order(top_directors$H_index, decreasing=TRUE), c(1,2)] %>% slice(1:10)
 
-# top 10 directors with tied positions
+# top 10 directors with tied positions (resolved equalities)
 top_directors[order(top_directors$H_index, decreasing=TRUE), c(1,2)] %>% filter(H_index >= 4)
-
-
 ```
 
